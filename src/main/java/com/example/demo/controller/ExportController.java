@@ -31,8 +31,7 @@ public class ExportController {
         PrintWriter writer = response.getWriter();
         List<Client> allClients = clientService.findAllClients();
         writer.println( "Nom;Prénom" );
-        for (Iterator<Client> i = allClients.iterator(); i.hasNext();) {
-            Client client = i.next();
+        for (Client client : allClients) {
             writer.println( client.getNom() + ";" + client.getPrenom() );
         }
     }
