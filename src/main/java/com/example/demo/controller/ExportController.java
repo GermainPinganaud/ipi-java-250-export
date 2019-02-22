@@ -19,6 +19,7 @@ import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -49,19 +50,48 @@ public class ExportController {
         }
     }
     @GetMapping("/clients/xlsx")
-    public void clientsXLSX(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        response.setContentType("text/xlsx");
-        response.setHeader("Content-Disposition", "attachment; filename=\"clients.xlsx\"");
-        List<Client> allClients = clientService.findAllClients();
+    public void clientsXlsx(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType("text/vnd.ms-excel");
+        response.setHeader("Content-Disposition", "attachment; filename=\"clients.xlsx\""); // là je lui dis qu'il va faire un fichier à télécharger et qu'il s'appelle clients.xlsx
         LocalDate now = LocalDate.now();
-        Workbook workbook = new XSSFWorkbook();
-        Sheet sheet = workbook.createSheet("Clients");
-        Row headerRow = sheet.createRow(0);
-        Cell cellPrenom = headerRow.createCell(0);
-        cellPrenom.setCellValue("Prénom");
-        workbook.write(response.getOutputStream());
-        workbook.close();
+        List<Client> clients = clientService.findAllClients();
 
+
+
+        Workbook workbook = new XSSFWorkbook(); // crée un fichier excel
+        Sheet sheet = workbook.createSheet("Clients"); // crée un onglet
+        Row headerRow = sheet.createRow(0); // crée une ligne
+
+        ArrayList<String> celTitres = new ArrayList<String>() ;
+        celTitres.add("Matricule");
+        celTitres.add("Prénom");
+        celTitres.add("Nom");
+        celTitres.add("Date de Naissance");
+        celTitres.add("Age");
+
+        int i =0;
+        for(String title : celTitres){
+            headerRow.createCell(i).setCellValue(title);
+            i++;
+        }
+        //Cell cellPrenom = headerRow.createCell(0); // crée une cellule
+        //cellPrenom.setCellValue("Matricule;Prénom;Nom;Date de Naissance"); // ajoute une valeur dans la cellule
+
+        int rowNum = 1;
+        for(Client client : clients){
+            Row row = sheet.createRow(rowNum++);
+            row.createCell(0).setCellValue(client.getId());
+            row.createCell(1).setCellValue(client.getPrenom());
+            row.createCell(2).setCellValue(client.getNom());
+            row.createCell(3).setCellValue(client.getBirthdate().format(DateTimeFormatter.ofPattern("dd/MM/YYYY")));
+            row.createCell(4).setCellValue((now.getYear()-client.getBirthdate().getYear()));
+        }
+
+
+        workbook.write(response.getOutputStream()); // ici on dit qu'on écrit dans un objet de type Output
+
+
+        workbook.close();
 
     }
 }
