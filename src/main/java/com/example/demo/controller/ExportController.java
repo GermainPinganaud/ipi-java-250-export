@@ -11,6 +11,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.format.DateTimeFormatter;
 import java.util.Iterator;
 import java.util.List;
 
@@ -30,9 +33,15 @@ public class ExportController {
         response.setHeader("Content-Disposition", "attachment; filename=\"clients.csv\"");
         PrintWriter writer = response.getWriter();
         List<Client> allClients = clientService.findAllClients();
-        writer.println( "Nom;Prénom" );
+        writer.println( "Nom;Prénom;Date de naissance;Age" );
+        LocalDate now = LocalDate.now();
         for (Client client : allClients) {
-            writer.println( client.getNom() + ";" + client.getPrenom() );
+            writer.println(
+                    client.getNom() + ";" +
+                    client.getPrenom() + ";" +
+                    client.getBirthdate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) + ";" +
+                    Period.between(client.getBirthdate(), now).getYears()
+            );
         }
     }
 

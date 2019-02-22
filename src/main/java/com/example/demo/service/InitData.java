@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import java.time.LocalDate;
 
 /**
  * Classe permettant d'insérer des données dans l'application.
@@ -25,20 +26,21 @@ public class InitData implements ApplicationListener<ApplicationReadyEvent> {
     }
 
     private void insertTestData() {
-        Client client1 = newClient("PETRILLO", "Alexandre");
+        Client client1 = newClient("PETRILLO", "Alexandre", LocalDate.of(1983, 12, 19));
         em.persist(client1);
 
-        Client client2 = newClient("DUPONT", "Jérome");
+        Client client2 = newClient("DUPONT", "Jérome", LocalDate.of(1957, 4, 3));
         em.persist(client2);
 
-        Client client3 = newClient("PINGANAUD", "Germain");
+        Client client3 = newClient("PINGANAUD", "Germain", LocalDate.of(1984, 8, 30));
         em.persist(client3);
     }
 
-    private Client newClient(String nom, String prenom) {
+    private Client newClient(String nom, String prenom, LocalDate birthdate) {
         Client client = new Client();
         client.setNom(nom);
         client.setPrenom(prenom);
+        client.setBirthdate(birthdate);
         return client;
     }
 }
